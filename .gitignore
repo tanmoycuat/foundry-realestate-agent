@@ -12,7 +12,9 @@ build/
 venv/
 .venv/
 env/
+.env
 .env/
+.azure/
 
 # Generated reports
 PROPERTY-*.pdf
@@ -26,6 +28,9 @@ PROPERTY-*.md
 # IDE
 .vscode/
 .idea/
+.pytest_cache/
+.coverage
+htmlcov/
 *.swp
 *.swo
 *~

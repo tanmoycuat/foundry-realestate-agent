@@ -1,0 +1,6 @@
+description: Real-estate analysis data tools
+tools:
+  - type: web_search
+    name: web_search
+    description: Search public web sources and return cited current information.
+    require_approval: never

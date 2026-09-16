@@ -1,0 +1,13 @@
+.git
+.github
+.venv
+.azure
+__pycache__
+.pytest_cache
+*.pyc
+*.pdf
+.env
+tests
+agents
+MIGRATION_PLAN.md
+EXECUTION_GUIDE.md

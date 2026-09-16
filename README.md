@@ -1,14 +1,14 @@
 <p align="center">
-  <img src=".github/banner.svg" alt="AI Real Estate Analyst — Claude Code Skill" width="900"/>
+  <img src=".github/banner.svg" alt="Foundry Real Estate Agent" width="900"/>
 </p>
 
 <p align="center">
-  <strong>AI-powered property research and investment analysis</strong> for Claude Code.<br/>
-  Analyze properties, estimate rental income, evaluate investment opportunities, write listings, and produce client-ready PDF reports — all from the command line.
+  <strong>Multi-agent property research and deterministic investment analysis</strong> using Microsoft Agent Framework.<br/>
+  Run locally, deploy as a Microsoft Foundry hosted agent, and manage business instructions as versioned Foundry Skills.
 </p>
 
 <p align="center">
-  <a href="#quick-start"><img src="https://img.shields.io/badge/install-one--liner-2d8a4e?style=for-the-badge" alt="Install"/></a>
+  <a href="#foundry-quick-start"><img src="https://img.shields.io/badge/runtime-Microsoft_Foundry-2d8a4e?style=for-the-badge" alt="Microsoft Foundry"/></a>
   <img src="https://img.shields.io/badge/skills-15-c9982e?style=for-the-badge" alt="15 Skills"/>
   <img src="https://img.shields.io/badge/agents-5-4a9eff?style=for-the-badge" alt="5 Agents"/>
   <img src="https://img.shields.io/badge/PDF_reports-yes-2d8a4e?style=for-the-badge" alt="PDF Reports"/>
@@ -17,9 +17,72 @@
 
 ---
 
+## Foundry Quick Start
+
+### Architecture
+
+- One Python hosted agent using the Foundry Responses protocol.
+- Five concurrent Agent Framework specialists: comps, rental, neighborhood, investment, and market.
+- Deterministic Python calculations for mortgages, rental metrics, weighted scores, grades, and signals.
+- Foundry Toolbox integration for web search, APIs, MCP servers, and versioned business Skills.
+- JSON, Markdown, and six-page ReportLab PDF output.
+
+### Local Setup
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev]"
+pytest -q
+```
+
+Create `.env` from `.env.example`, then provide:
+
+```text
+FOUNDRY_PROJECT_ENDPOINT
+AZURE_AI_MODEL_DEPLOYMENT_NAME
+TOOLBOX_ENDPOINT
+```
+
+Start the Responses host:
+
+```powershell
+python .\src\realestate_agent\main.py
+```
+
+The local service listens on `http://localhost:8088` and exposes `/readiness` and `/responses`.
+
+### Deploy to Microsoft Foundry
+
+The current Foundry sample requires Azure Developer CLI 1.27.1 or newer and the unified Foundry extension:
+
+```powershell
+azd extension install microsoft.foundry
+azd auth login
+azd provision
+azd deploy
+azd ai agent show
+azd ai agent invoke "Analyze the supplied property data"
+```
+
+See [EXECUTION_GUIDE.md](EXECUTION_GUIDE.md) for the complete setup, Toolbox, Skills, deployment, governance, and GitHub publishing procedure. See [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for design decisions and acceptance criteria.
+
+### Current Migration Status
+
+- Typed request, evidence, specialist, and result contracts are implemented.
+- Mortgage, rental, score, grade, and signal calculations are deterministic and tested.
+- Local legacy skills are loaded as a development fallback.
+- The five-specialist concurrent Agent Framework workflow is implemented.
+- Foundry Responses hosting, Toolbox configuration, Docker, and Azure deployment manifests are included.
+- PDF generation reuses the existing visual report generator through a typed adapter.
+
+The original Claude Code skills remain in this repository as migration inputs and may still be installed with the legacy scripts below.
+
+---
+
 ## What It Does
 
-The AI Real Estate Analyst turns Claude Code into a comprehensive property research system. It runs **5 parallel AI agents** to analyze any property across value, income potential, neighborhood quality, investment upside, and market conditions — then produces a composite **Property Score (0-100)** with a clear buy/hold/pass signal.
+The AI Real Estate Analyst runs **5 parallel AI agents** to analyze any property across value, income potential, neighborhood quality, investment upside, and market conditions, then produces a composite **Property Score (0-100)** with a clear buy/hold/pass signal.
 
 ### Feature Highlights
 
