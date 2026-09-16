@@ -1,347 +1,92 @@
-<p align="center">
-  <img src=".github/banner.svg" alt="Foundry Real Estate Agent" width="900"/>
-</p>
+# Foundry Real Estate Agent
 
-<p align="center">
-  <strong>Multi-agent property research and deterministic investment analysis</strong> using Microsoft Agent Framework.<br/>
-  Run locally, deploy as a Microsoft Foundry hosted agent, and manage business instructions as versioned Foundry Skills.
-</p>
+A Python hosted agent for Microsoft Foundry that combines five specialist analyses with deterministic real-estate calculations.
 
-<p align="center">
-  <a href="#foundry-quick-start"><img src="https://img.shields.io/badge/runtime-Microsoft_Foundry-2d8a4e?style=for-the-badge" alt="Microsoft Foundry"/></a>
-  <img src="https://img.shields.io/badge/skills-15-c9982e?style=for-the-badge" alt="15 Skills"/>
-  <img src="https://img.shields.io/badge/agents-5-4a9eff?style=for-the-badge" alt="5 Agents"/>
-  <img src="https://img.shields.io/badge/PDF_reports-yes-2d8a4e?style=for-the-badge" alt="PDF Reports"/>
-  <img src="https://img.shields.io/badge/license-MIT-1a2332?style=for-the-badge" alt="MIT License"/>
-</p>
+## Capabilities
 
----
+- Runs comparable-sales, rental, neighborhood, investment, and market specialists concurrently.
+- Calculates mortgage payments and weighted property scores in Python.
+- Produces validated JSON, Markdown, and PDF reports.
+- Uses source-controlled business instructions from `skills/` during local development.
+- Connects to a Foundry Toolbox for external data and tools.
+- Exposes the Foundry Responses protocol on port `8088`.
 
-## Foundry Quick Start
+## Project Structure
 
-### Architecture
+```text
+src/realestate_agent/   Application code
+skills/                 Local business-instruction baselines
+tests/                  Unit and workflow tests
+agent.yaml              Hosted-agent definition
+azure.yaml              Azure Developer CLI configuration
+toolbox.yaml             Toolbox definition
+Dockerfile              Container image
+```
 
-- One Python hosted agent using the Foundry Responses protocol.
-- Five concurrent Agent Framework specialists: comps, rental, neighborhood, investment, and market.
-- Deterministic Python calculations for mortgages, rental metrics, weighted scores, grades, and signals.
-- Foundry Toolbox integration for web search, APIs, MCP servers, and versioned business Skills.
-- JSON, Markdown, and six-page ReportLab PDF output.
+## Local Setup
 
-### Local Setup
+Requirements:
+
+- Python 3.11 or newer
+- Azure credentials available to `DefaultAzureCredential`
+- Access to a Microsoft Foundry project and model deployment
+
+Create an environment and install the project:
 
 ```powershell
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
-pytest -q
+Copy-Item .env.example .env
 ```
 
-Create `.env` from `.env.example`, then provide:
+Set these values in `.env`:
 
 ```text
-FOUNDRY_PROJECT_ENDPOINT
-AZURE_AI_MODEL_DEPLOYMENT_NAME
-TOOLBOX_ENDPOINT
+FOUNDRY_PROJECT_ENDPOINT=https://your-account.services.ai.azure.com/api/projects/your-project
+AZURE_AI_MODEL_DEPLOYMENT_NAME=your-model-deployment
+TOOLBOX_ENDPOINT=https://your-account.services.ai.azure.com/api/projects/your-project/toolboxes/realestate-data/mcp?api-version=v1
 ```
 
-Start the Responses host:
+`TOOLBOX_ENDPOINT` is optional when no external Toolbox is configured.
+
+Start the agent:
 
 ```powershell
 python .\src\realestate_agent\main.py
 ```
 
-The local service listens on `http://localhost:8088` and exposes `/readiness` and `/responses`.
+The service listens on `http://localhost:8088`.
 
-### Deploy to Microsoft Foundry
+## Tests
 
-The current Foundry sample requires Azure Developer CLI 1.27.1 or newer and the unified Foundry extension:
+```powershell
+pytest -q
+```
+
+## Deploy
+
+Install Azure Developer CLI 1.27.1 or newer and the Microsoft Foundry extension, then authenticate and deploy:
 
 ```powershell
 azd extension install microsoft.foundry
 azd auth login
 azd provision
 azd deploy
-azd ai agent show
-azd ai agent invoke "Analyze the supplied property data"
 ```
 
-See [EXECUTION_GUIDE.md](EXECUTION_GUIDE.md) for the complete setup, Toolbox, Skills, deployment, governance, and GitHub publishing procedure. See [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for design decisions and acceptance criteria.
+## Configuration
 
-### Current Migration Status
-
-- Typed request, evidence, specialist, and result contracts are implemented.
-- Mortgage, rental, score, grade, and signal calculations are deterministic and tested.
-- Local legacy skills are loaded as a development fallback.
-- The five-specialist concurrent Agent Framework workflow is implemented.
-- Foundry Responses hosting, Toolbox configuration, Docker, and Azure deployment manifests are included.
-- PDF generation reuses the existing visual report generator through a typed adapter.
-
-The original Claude Code skills remain in this repository as migration inputs and may still be installed with the legacy scripts below.
-
----
-
-## What It Does
-
-The AI Real Estate Analyst runs **5 parallel AI agents** to analyze any property across value, income potential, neighborhood quality, investment upside, and market conditions, then produces a composite **Property Score (0-100)** with a clear buy/hold/pass signal.
-
-### Feature Highlights
-
-| Feature | Description |
-|---------|-------------|
-| **Full Property Analysis** | 5 parallel agents analyze value, income, neighborhood, investment, and market simultaneously |
-| **Property Score (0-100)** | Weighted composite score with letter grade (A+ to F) and investment signal |
-| **Comp Analysis** | Recent comparable sales, price per sq ft, fair market value estimate |
-| **Cash Flow Projections** | Monthly/annual rental income, expenses, NOI, cap rate, cash-on-cash return |
-| **Neighborhood Intelligence** | Schools, crime, walkability, demographics, growth trajectory |
-| **Investment Scenarios** | Buy-and-hold, BRRRR, fix-and-flip with ROI projections |
-| **Professional Listings** | MLS-ready property descriptions |
-| **Mortgage Calculator** | Payment estimates, affordability analysis, rate comparison |
-| **Market Analysis** | Local inventory, days on market, price trends, seasonality |
-| **Property Screener** | Filter properties by investment criteria |
-| **PDF Reports** | Professional 6-page reports with charts, tables, and gauges |
-| **Commercial Analysis** | NOI, cap rate, lease terms, tenant quality for commercial properties |
-
----
-
-## Quick Start
-
-### One-Command Install (macOS / Linux)
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/zubair-trabzada/ai-realestate-claude/main/install.sh | bash
-```
-
-### Manual Install
-
-```bash
-git clone https://github.com/zubair-trabzada/ai-realestate-claude.git
-cd ai-realestate-claude
-./install.sh
-```
-
-### Requirements
-
-- Python 3.8+
-- Claude Code CLI
-- Git
-- `reportlab` (installed automatically)
-
----
-
-## Commands
-
-Open Claude Code and use these commands:
-
-| Command | What It Does | Output |
-|---------|-------------|--------|
-| `/realestate analyze <address>` | Full property analysis (5 parallel agents) | `PROPERTY-ANALYSIS-*.md` |
-| `/realestate quick <address>` | 60-second property snapshot | Terminal output |
-| `/realestate comps <address>` | Comparable sales analysis | `PROPERTY-COMPS-*.md` |
-| `/realestate rental <address>` | Rental income & cash flow projection | `PROPERTY-RENTAL-*.md` |
-| `/realestate listing <address>` | Professional MLS-ready listing | `PROPERTY-LISTING-*.md` |
-| `/realestate invest <address>` | Investment analysis (buy-hold, BRRRR, flip) | `PROPERTY-INVEST-*.md` |
-| `/realestate neighborhood <addr>` | Schools, crime, walkability, demographics | `PROPERTY-NEIGHBORHOOD-*.md` |
-| `/realestate flip <address>` | Fix-and-flip analysis with rehab budget | `PROPERTY-FLIP-*.md` |
-| `/realestate commercial <address>` | Commercial property analysis | `PROPERTY-COMMERCIAL-*.md` |
-| `/realestate mortgage <price>` | Mortgage calculator & affordability | `PROPERTY-MORTGAGE.md` |
-| `/realestate market <city/zip>` | Local market conditions & trends | `PROPERTY-MARKET-*.md` |
-| `/realestate compare <a1> <a2>` | Side-by-side property comparison | `PROPERTY-COMPARE.md` |
-| `/realestate screen <criteria>` | Property screener by investment criteria | `PROPERTY-SCREEN-*.md` |
-| `/realestate report-pdf` | Professional PDF property report | `PROPERTY-REPORT.pdf` |
-
----
-
-## Architecture
-
-```
-ai-realestate-claude/
-├── realestate/                     # Main skill orchestrator
-│   ├── SKILL.md                    # Primary skill file — routing, scoring, output standards
-│   └── scripts/
-│       └── generate_realestate_pdf.py  # PDF report generator (ReportLab)
-├── skills/                         # 14 sub-skills
-│   ├── realestate-analyze/         # Full analysis orchestrator (launches 5 agents)
-│   ├── realestate-comps/           # Comparable sales analysis
-│   ├── realestate-rental/          # Rental income & cash flow
-│   ├── realestate-listing/         # MLS-ready listing writer
-│   ├── realestate-invest/          # Investment analysis (buy-hold, BRRRR, flip)
-│   ├── realestate-neighborhood/    # Schools, crime, walkability, demographics
-│   ├── realestate-flip/            # Fix-and-flip analysis
-│   ├── realestate-commercial/      # Commercial property analysis
-│   ├── realestate-mortgage/        # Mortgage calculator
-│   ├── realestate-market/          # Local market conditions
-│   ├── realestate-compare/         # Side-by-side comparison
-│   ├── realestate-screen/          # Property screener
-│   ├── realestate-quick/           # 60-second snapshot
-│   └── realestate-report-pdf/      # PDF report generation
-├── agents/                         # 5 parallel subagents
-│   ├── realestate-comps.md         # Comparable sales agent
-│   ├── realestate-rental.md        # Rental income agent
-│   ├── realestate-neighborhood.md  # Neighborhood analysis agent
-│   ├── realestate-invest.md        # Investment analysis agent
-│   └── realestate-market.md        # Market conditions agent
-├── install.sh                      # One-command installer
-├── uninstall.sh                    # Clean uninstaller
-├── requirements.txt                # Python dependencies
-└── README.md
-```
-
----
-
-## Scoring Methodology
-
-The **Property Score (0-100)** is a weighted composite of 5 analysis dimensions:
-
-| Category | Weight | What It Measures |
-|----------|--------|------------------|
-| Value & Comps | 25% | Price vs comps, price per sq ft, fair market value |
-| Income Potential | 20% | Rental yield, cash flow, cap rate, cash-on-cash return |
-| Neighborhood Quality | 20% | Schools, safety, walkability, amenities, growth |
-| Investment Upside | 20% | Appreciation potential, value-add opportunity, exit strategies |
-| Market Conditions | 15% | Supply/demand, days on market, price trends, seasonality |
-
-### Grade & Signal
-
-| Score | Grade | Signal |
-|-------|-------|--------|
-| 85-100 | A+ | **Strong Buy** — excellent value across all dimensions |
-| 70-84 | A | **Buy** — favorable fundamentals with manageable risks |
-| 55-69 | B | **Hold/Watch** — mixed signals, deeper due diligence needed |
-| 40-54 | C | **Caution** — significant concerns in one or more areas |
-| 25-39 | D | **Pass** — unfavorable risk/reward at current pricing |
-| 0-24 | F | **Avoid** — major red flags, walk away |
-
----
-
-## Property Types Supported
-
-| Type | Key Analysis Focus |
-|------|-------------------|
-| **Single Family** | Comps, rental yield, appreciation, school district, flip potential |
-| **Multi-Family (2-4)** | Gross rent multiplier, unit mix, per-unit value, house hacking |
-| **Multi-Family (5+)** | NOI, cap rate, expense ratio, value-add, 1031 exchange |
-| **Condo / Townhouse** | HOA fees impact, special assessments, rental restrictions |
-| **Commercial** | NOI, cap rate, lease terms, tenant quality, zoning |
-| **Land** | Zoning, buildability, utilities, entitlements, highest-and-best-use |
-| **Short-Term Rental** | ADR, occupancy, seasonality, local regulations, STR comps |
-
----
-
-## Use Cases
-
-### Real Estate Agents
-- Generate professional listing descriptions in seconds
-- Provide clients with data-backed property analysis
-- Compare properties side-by-side for buyer presentations
-- Create market condition reports for listing appointments
-
-### Investors
-- Screen properties by investment criteria (cap rate, cash flow, 1% rule)
-- Run full investment analysis with buy-hold, BRRRR, and flip scenarios
-- Project cash flow with conservative vacancy and expense estimates
-- Generate professional PDF reports for partners or lenders
-
-### House Hunters
-- Get a 60-second snapshot on any property of interest
-- Understand neighborhood quality (schools, crime, walkability)
-- Calculate true monthly costs including PITI, maintenance, and HOA
-- Compare two properties head-to-head with scored analysis
-
----
-
-## Example Output
-
-```
-/realestate quick 4821 Ridgeview Dr, Austin TX 78735
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  QUICK PROPERTY SNAPSHOT
-  4821 Ridgeview Dr, Austin TX 78735
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  Price:          $425,000
-  Beds/Baths:     3 bd / 2 ba
-  Sq Ft:          1,850
-  Price/Sq Ft:    $230
-  Year Built:     1998
-
-  Property Score: 72/100 (Grade: A)
-  Signal:         BUY
-
-  Top 3 Factors:
-  1. Neighborhood growth trajectory: +8.2% (5yr)
-  2. Priced at comp average — room to negotiate 3-5%
-  3. Strong school district (7/10) supports demand
-
-  Estimated Rental:  $2,100-$2,300/mo
-  Est. Cap Rate:     5.2%
-  Market Temp:       Warm — 18 days avg DOM
-
-  DISCLAIMER: AI-generated research for educational
-  purposes only. Not financial or investment advice.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
----
-
-## PDF Reports
-
-Generate professional 6-page property reports with:
-
-- **Cover page** with Property Score gauge (color-coded 0-100)
-- **Property details** table (address, price, beds, baths, sqft, year built, lot size)
-- **Score dashboard** with horizontal bar chart and category breakdown
-- **Comp analysis** summary table with recent comparable sales
-- **Cash flow projections** (monthly and annual) with investment metrics
-- **Neighborhood scores** bar chart (schools, crime, walkability, transit, growth)
-- **Investment analysis** with strategy comparison and appreciation projections
-- **Recommendation section** with suggested offer, action items, and risk matrix
-
-Color scheme: Navy (#1a2332), Forest Green (#2d8a4e), Warm Gold (#c9982e)
-
-```bash
-# Generate a sample PDF report
-python3 ~/.claude/skills/realestate/scripts/generate_realestate_pdf.py --demo
-```
-
----
-
-## Data Sources
-
-The tool gathers data from publicly available sources:
-
-- Current property listings and recent sales
-- County assessor and tax records
-- School ratings and district data
-- Crime statistics and safety reports
-- Walk Score, Transit Score, Bike Score
-- Census and demographic data
-- Market reports and inventory data
-
----
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/new-analysis`)
-3. Commit your changes (`git commit -m 'Add new analysis type'`)
-4. Push to the branch (`git push origin feature/new-analysis`)
-5. Open a Pull Request
-
----
-
-## License
-
-MIT License. See [LICENSE](LICENSE) for details.
-
----
+| Variable | Required | Purpose |
+|---|---:|---|
+| `FOUNDRY_PROJECT_ENDPOINT` | Yes | Foundry project endpoint used by the local host |
+| `AZURE_AI_MODEL_DEPLOYMENT_NAME` | Yes | Model deployment used by specialist agents |
+| `TOOLBOX_ENDPOINT` | No | MCP endpoint for the project Toolbox |
+| `TOOLBOX_NAME` | No | Toolbox name; defaults to `realestate-data` |
+| `DEFAULT_MODEL_PROFILE` | No | Logical model profile recorded in results |
+| `SKILL_CACHE_TTL_SECONDS` | No | Skill cache lifetime; defaults to 60 seconds |
 
 ## Disclaimer
 
-This tool is for **educational and research purposes only**. It is **NOT** financial or investment advice. Real estate values, rental estimates, and investment projections are AI-generated approximations based on publicly available data. Always verify all information with licensed professionals — real estate agents, appraisers, inspectors, and financial advisors — before making any purchase or investment decisions. Real estate investments involve significant risk including potential loss of capital.
-
----
-
-<p align="center">
-  Built for <a href="https://claude.com/claude-code">Claude Code</a>
-</p>
+This project provides educational and research output only. It is not an appraisal, inspection, legal opinion, or financial or investment advice. Verify property data and decisions with qualified professionals.

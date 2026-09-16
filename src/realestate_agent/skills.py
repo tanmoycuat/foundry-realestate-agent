@@ -1,4 +1,4 @@
-"""Skill loading with a source-controlled fallback for local development."""
+"""Load source-controlled business instructions for local development."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ def _header_value(header: str, key: str) -> str | None:
 
 
 def parse_skill(content: str, *, fallback_name: str, source: str) -> LoadedSkill:
-    """Parse Foundry Agent Skills-compatible Markdown and common legacy variants."""
+    """Parse Foundry Agent Skills-compatible Markdown with optional front matter."""
     match = FRONT_MATTER.match(content)
     if match:
         header = match.group("header")
@@ -56,12 +56,7 @@ class LocalSkillRepository:
         self.root = root or Path(__file__).resolve().parents[2]
 
     def load(self, name: str) -> LoadedSkill:
-        candidates = [
-            self.root / "skills-baseline" / name / "SKILL.md",
-            self.root / "skills" / name / "SKILL.md",
-            self.root / "realestate" / "SKILL.md" if name == "realestate-main" else Path("__missing__"),
-        ]
-        for path in candidates:
-            if path.is_file():
-                return parse_skill(path.read_text(encoding="utf-8"), fallback_name=name, source=str(path))
-        raise FileNotFoundError(f"Skill not found: {name}")
+        path = self.root / "skills" / name / "SKILL.md"
+        if not path.is_file():
+            raise FileNotFoundError(f"Skill not found: {name}")
+        return parse_skill(path.read_text(encoding="utf-8"), fallback_name=name, source=str(path))

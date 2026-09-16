@@ -8,6 +8,3 @@ __pycache__
 *.pdf
 .env
 tests
-agents
-MIGRATION_PLAN.md
-EXECUTION_GUIDE.md

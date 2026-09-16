@@ -9,9 +9,7 @@ WORKDIR /home/appuser/app
 
 COPY --chown=appuser pyproject.toml README.md ./
 COPY --chown=appuser src ./src
-COPY --chown=appuser scripts ./scripts
 COPY --chown=appuser skills ./skills
-COPY --chown=appuser realestate ./realestate
 RUN python -m pip install --no-cache-dir .
 
 EXPOSE 8088

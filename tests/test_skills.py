@@ -13,8 +13,8 @@ def test_parse_foundry_skill() -> None:
     assert skill.instructions == "Do the work."
 
 
-def test_load_legacy_skill_from_workspace() -> None:
+def test_load_project_skill_from_workspace() -> None:
     root = Path(__file__).resolve().parents[1]
     skill = LocalSkillRepository(root).load("realestate-comps")
     assert skill.name == "realestate-comps"
-    assert "Comparable" in skill.instructions
+    assert "comparable" in skill.instructions.lower()
