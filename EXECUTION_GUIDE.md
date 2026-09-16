@@ -6,7 +6,16 @@ Run each stage separately and complete its check before continuing.
 
 ## 1. Repair and verify local tools
 
-The current machine has Python 3.12.10, GitHub CLI authentication for `tanmoycuat`, Azure Developer CLI 1.25.4, and the Foundry extensions. Git 2.36.1 is installed at `C:\Users\se-tansan01\AppData\Local\Programs\Git\cmd\git.exe`, but the current terminal does not include that directory in `PATH`. The current Foundry sample requires `azd >= 1.27.1`.
+Current verified tooling:
+
+- Python 3.12.10;
+- Git 2.36.1 on `PATH`;
+- GitHub CLI authenticated as `tanmoycuat`;
+- Azure Developer CLI 1.34.0;
+- `microsoft.foundry` 1.0.0-beta.2 and current agent, skills, and Toolbox extensions;
+- Azure CLI authenticated to the `Newsec Foundry DevTest` subscription.
+
+The commands below are only needed on another machine or after a tool reset.
 
 Open PowerShell and run:
 
